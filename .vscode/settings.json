@@ -1,0 +1,16 @@
+{
+    "C_Cpp.errorSquiggles": "Disabled",
+    "files.associations": {
+        "stdio.h": "c",
+        "stdlib.h": "c",
+        "typeinfo": "c",
+        "cstdlib": "c",
+        "type_traits": "c",
+        "string.h": "c",
+        "math.h": "c",
+        "cson.h": "c",
+        "stddef.h": "c",
+        "limits.h": "c",
+        "log.h": "c"
+    }
+}
