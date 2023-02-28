@@ -1,0 +1,303 @@
+{
+  "AttributeList": [
+    {
+      "attr": "DeviceModel",
+      "status": {
+        "offset": 5,
+        "len": 2
+      }
+    },
+    {
+      "attr": "WorkModeState",
+      "cmd": {
+        "offset": 14,
+        "len": 1,
+        "bit_index": 0
+      },
+      "status": {
+        "offset": 10,
+        "len": 1
+      }
+    },
+    {
+      "attr": "PowerSwitchAll",
+      "status": {
+        "offset": 11,
+        "len": 1
+      }
+    },
+    {
+      "attr": "SetPowerOnTime",
+      "cmd": {
+        "offset": 12,
+        "len": 1,
+        "bit_index": 0
+      },
+      "status": {
+        "offset": 12,
+        "len": 1
+      }
+    },
+    {
+      "attr": "SetPowerOffTime",
+      "cmd": {
+        "offset": 13,
+        "len": 1,
+        "bit_index": 0
+      },
+      "status": {
+        "offset": 13,
+        "len": 1
+      }
+    },
+    {
+      "attr": "LeaseRemainDay",
+      "cmd": {
+        "offset": 15,
+        "len": 2,
+        "bit_index": 0
+      },
+      "status": {
+        "offset": 15,
+        "len": 2
+      }
+    },
+    {
+      "attr": "IntakeMode",
+      "cmd": {
+        "offset": 17,
+        "len": 1,
+        "bit_index": 0
+      },
+      "status": {
+        "offset": 17,
+        "len": 1
+      }
+    },
+    {
+      "attr": "OnekeyDrain",
+      "cmd": {
+        "offset": 18,
+        "len": 1,
+        "bit_index": 0
+      },
+      "status": {
+        "offset": 18,
+        "len": 1
+      }
+    },
+    {
+      "attr": "SetBoilingPoint",
+      "cmd": {
+        "offset": 19,
+        "len": 1,
+        "bit_index": 0
+      },
+      "status": {
+        "offset": 19,
+        "len": 1
+      }
+    },
+    {
+      "attr": "NormalTemperature",
+      "status": {
+        "offset": 20,
+        "len": 1
+      }
+    },
+    {
+      "attr": "HeatingBoxTemperature",
+      "status": {
+        "offset": 21,
+        "len": 1
+      }
+    },
+    {
+      "attr": "WarmWater",
+      "status": {
+        "offset": 22,
+        "len": 1
+      }
+    },
+    {
+      "attr": "DrainState",
+      "status": {
+        "offset": 23,
+        "len": 1
+      }
+    },
+    {
+      "attr": "WaterLevel",
+      "status": {
+        "offset": 24,
+        "len": 1
+      }
+    },
+    {
+      "attr": "FilterElementTime1",
+      "status": {
+        "offset": 35,
+        "len": 2
+      }
+    },
+    {
+      "attr": "FilterElemenetFlux1",
+      "status": {
+        "offset": 37,
+        "len": 2
+      }
+    },
+    {
+      "attr": "FilterElementTime2",
+      "status": {
+        "offset": 39,
+        "len": 2
+      }
+    },
+    {
+      "attr": "FilterElemenetFlux2",
+      "status": {
+        "offset": 41,
+        "len": 2
+      }
+    },
+    {
+      "attr": "FilterElementTime3",
+      "status": {
+        "offset": 43,
+        "len": 2
+      }
+    },
+    {
+      "attr": "FilterElemenetFlux3",
+      "status": {
+        "offset": 45,
+        "len": 2
+      }
+    },
+    {
+      "attr": "ErrorNum",
+      "status": {
+        "offset": 67,
+        "len": 1
+      }
+    },
+    {
+      "attr": "AmountWater4",
+      "status": {
+        "offset": 31,
+        "len": 1
+      }
+    },
+    {
+      "attr": "AmountWater3",
+      "status": {
+        "offset": 32,
+        "len": 1
+      }
+    },
+    {
+      "attr": "AmountWater2",
+      "status": {
+        "offset": 33,
+        "len": 1
+      }
+    },
+    {
+      "attr": "AmountWater1",
+      "status": {
+        "offset": 34,
+        "len": 1
+      }
+    },
+    {
+      "attr": "SignalStrength",
+      "status": {
+        "offset": 9,
+        "len": 1
+      }
+    },
+    {
+      "attr": "Replace1",
+      "status": {
+        "offset": 68,
+        "len": 1
+      }
+    },
+    {
+      "attr": "Replace2",
+      "status": {
+        "offset": 69,
+        "len": 1
+      }
+    },
+    {
+      "attr": "Replace3",
+      "status": {
+        "offset": 70,
+        "len": 1
+      }
+    },
+    {
+      "attr": "ShowTemperature",
+      "status": {
+        "offset": 76,
+        "len": 1
+      }
+    }
+  ],
+  "version": "V1.1",
+  "dataType": 0,
+  "uploadFilter": 1,
+  "header": {
+    "cmd": {
+      "head": {
+        "offset": 0,
+        "len": 2,
+        "default": 62709
+      },
+      "len": {
+        "offset": 2,
+        "len": 1
+      },
+      "type": {
+        "offset": 3,
+        "len": 1,
+        "default": 2
+      },
+      "cmd": {
+        "offset": 4,
+        "len": 1,
+        "default": 200
+      },
+      "stat": {
+        "offset": 74,
+        "len": 0,
+        "default": 0
+      },
+      "flags": {
+        "offset": 8,
+        "len": 0,
+        "default": 0
+      },
+      "payloadBitFlag": {
+        "offset": 10,
+        "len": 0
+      },
+      "payloadData": {
+        "offset": 5,
+        "len": 73
+      },
+      "crc": {
+        "offset": 78,
+        "len": 2
+      }
+    },
+    "status": {
+      "payloadData": {
+        "offset": 5,
+        "len": 73
+      }
+    }
+  }
+}

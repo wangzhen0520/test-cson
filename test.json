@@ -1,0 +1,21 @@
+{
+    "songList":[
+        {
+            "cmd": {
+                "offset": 14,
+                "len": 1,
+                "bit_index": 0
+            },
+            "status": {
+                "offset": 10,
+                "len": 1
+            }
+        },
+        {
+            "status": {
+                "offset": 10,
+                "len": 1
+            }
+        }
+    ]
+}
