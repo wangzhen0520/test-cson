@@ -43,6 +43,11 @@ const reflect_item_t stringReflectTbl[] = {
     {}
 };
 
+const reflect_item_t stringsReflectTbl[] = {
+    {"0Strings", 0, sizeof(char) * 1024, CSON_STRINGS, NULL, 0, NULL, 1},
+    {}
+};
+
 const reflect_item_t realReflectTbl[] = {
     {"0Real", 0, sizeof(double), CSON_REAL, NULL, 0, NULL, 1},
     {}
@@ -91,6 +96,8 @@ static int getJsonBool(void* input, const reflect_item_t* tbl, int index, cson_t
 json_pack_proc jsonPackTbl[] = {
     getJsonObject,
     getJsonArray,
+    getJsonArray,
+    getJsonString,
     getJsonString,
     getJsonInteger,
     getJsonReal,
@@ -108,7 +115,9 @@ typedef int (*json_obj_proc)(cson_t jo_tmp, void* output, const reflect_item_t* 
 
 static int parseJsonObject(cson_t jo_tmp, void* output, const reflect_item_t* tbl, int index);
 static int parseJsonArray(cson_t jo_tmp, void* output, const reflect_item_t* tbl, int index);
+static int parseJsonArrays(cson_t jo_tmp, void* output, const reflect_item_t* tbl, int index);
 static int parseJsonString(cson_t jo_tmp, void* output, const reflect_item_t* tbl, int index);
+static int parseJsonStrings(cson_t jo_tmp, void* output, const reflect_item_t* tbl, int index);
 static int parseJsonInteger(cson_t jo_tmp, void* output, const reflect_item_t* tbl, int index);
 static int parseJsonReal(cson_t jo_tmp, void* output, const reflect_item_t* tbl, int index);
 static int parseJsonBool(cson_t jo_tmp, void* output, const reflect_item_t* tbl, int index);
@@ -116,7 +125,9 @@ static int parseJsonBool(cson_t jo_tmp, void* output, const reflect_item_t* tbl,
 json_obj_proc jsonObjProcTbl[] = {
     parseJsonObject,
     parseJsonArray,
+    parseJsonArrays,
     parseJsonString,
+    parseJsonStrings,
     parseJsonInteger,
     parseJsonReal,
     parseJsonBool,
@@ -133,6 +144,8 @@ static int parseJsonRealDefault(cson_t jo_tmp, void* output, const reflect_item_
 json_obj_proc jsonObjDefaultTbl[] = {
     parseJsonObjectDefault,
     parseJsonArrayDefault,
+    parseJsonArrayDefault,
+    parseJsonStringDefault,
     parseJsonStringDefault,
     parseJsonIntegerDefault,
     parseJsonRealDefault,
@@ -225,7 +238,11 @@ int getJsonString(void* input, const reflect_item_t* tbl, int index, cson_t* obj
 
     if (*((char**)pSrc) == NULL) return ERR_MISSING_FIELD;
 
-    *obj = cson_string(*((char**)pSrc));
+    if (tbl[index].type == CSON_STRINGS) {
+        *obj = cson_string((char*)pSrc);
+    } else {
+        *obj = cson_string(*((char**)pSrc));
+    }
     return ERR_NONE;
 }
 
@@ -248,7 +265,12 @@ int getJsonArray(void* input, const reflect_item_t* tbl, int index, cson_t* obj)
 {
     int ret = ERR_NONE;
     int countIndex = -1;
-    char* pSrc = (*(char**)((char*)input + tbl[index].offset));
+    char* pSrc = NULL;
+    if (tbl[index].type == CSON_ARRAY) {
+        pSrc = (*(char**)((char*)input + tbl[index].offset));
+    } else {
+        pSrc = (char*)input + tbl[index].offset;
+    }
 
     if (pSrc == NULL) return ERR_MISSING_FIELD;
 
@@ -366,7 +388,7 @@ int csonJsonObj2Struct(cson_t jo, void* output, const reflect_item_t* tbl)
 
             int jsonType = cson_typeof(jo_tmp);
 
-            if (jsonType == tbl[i].type ||
+            if (jsonType == tbl[i].type || tbl[i].type == CSON_STRINGS || tbl[i].type == CSON_ARRAYS ||
                 (cson_is_number(cson_typeof(jo_tmp)) && cson_is_number(tbl[i].type)) ||
                 (cson_is_bool(cson_typeof(jo_tmp)) && cson_is_bool(tbl[i].type))) {
                 if (jsonObjProcTbl[tbl[i].type] != NULL) {
@@ -377,8 +399,8 @@ int csonJsonObj2Struct(cson_t jo, void* output, const reflect_item_t* tbl)
             }
         }
 
-        if (ret != ERR_NONE ) {
-            log_error("!!!!parse error on field:%s type:%d, cod=%d!!!!", tbl[i].field, tbl[i].type, ret);
+        if (ret != ERR_NONE) {
+            log_warn("!!!!parse error on field:%s type:%d, cod=%d!!!!", tbl[i].field, tbl[i].type, ret);
             jsonObjDefaultTbl[tbl[i].type](NULL, output, tbl, i);
             if (!(tbl[i].exArgs & _ex_args_nullable)) return ret;
         }
@@ -397,6 +419,20 @@ int parseJsonString(cson_t jo_tmp, void* output, const reflect_item_t* tbl, int 
         }
         strcpy(pDst, tempstr);
         csonSetPropertyFast(output, &pDst, tbl + index);
+
+        return ERR_NONE;
+    }
+
+    return ERR_MISSING_FIELD;
+}
+
+int parseJsonStrings(cson_t jo_tmp, void* output, const reflect_item_t* tbl, int index)
+{
+    const char* tempstr = cson_string_value(jo_tmp);
+    if (NULL != tempstr) {
+        char* pDst = (char*)output + tbl[index].offset;
+        csonSetPropertyFast(output, tempstr, tbl + index);
+        pDst[tbl[index].size - 1] = '\0';
 
         return ERR_NONE;
     }
@@ -477,6 +513,65 @@ int parseJsonArray(cson_t jo_tmp, void* output, const reflect_item_t* tbl, int i
     } else {
         csonSetPropertyFast(output, &val, tbl + countIndex);
         csonSetPropertyFast(output, &pMem, tbl + index);
+        return ERR_NONE;
+    }
+}
+
+int parseJsonArrays(cson_t jo_tmp, void* output, const reflect_item_t* tbl, int index)
+{
+    size_t arraySize = cson_array_size(jo_tmp);
+
+    if (arraySize == 0) {
+        csonSetProperty(output, tbl[index].arrayCountField, &arraySize, tbl);
+        return ERR_NONE;
+    }
+
+    int countIndex = -1;
+    csonGetProperty(output, tbl[index].arrayCountField, tbl, &countIndex);
+
+    if (countIndex == -1) {
+        return ERR_MISSING_FIELD;
+    }
+
+    size_t arraySizeDef = tbl[index].size / tbl[index].arrayItemSize;
+    if (arraySizeDef < arraySize) {
+        log_error("input array size[%d] oversize define[%d]", arraySize, arraySizeDef);
+        return ERR_OVERFLOW;
+    }
+
+    char* pMem = (char*)output + tbl[index].offset;
+    memset(pMem, 0, arraySize * tbl[index].arrayItemSize);
+
+    long long successCount = 0;
+    for (size_t j = 0; j < arraySize; j++) {
+        cson_t item = cson_array_get(jo_tmp, j);
+        if (item != NULL) {
+            int ret;
+
+            if (tbl[index].reflect_tbl[0].field[0] == '0') {    /* field start with '0' mean basic types. */
+                ret = jsonObjProcTbl[tbl[index].reflect_tbl[0].type](item, pMem + (successCount * tbl[index].arrayItemSize), tbl[index].reflect_tbl, 0);
+            } else {
+                ret = csonJsonObj2Struct(item, pMem + (successCount * tbl[index].arrayItemSize), tbl[index].reflect_tbl);
+            }
+
+            if (ret == ERR_NONE) {
+                successCount++;
+            }
+        }
+    }
+
+    integer_val_t val;
+    if (convertInteger(successCount, tbl[countIndex].size, &val) != ERR_NONE) {
+        successCount = 0;
+    }
+
+    if (successCount == 0) {
+        csonSetPropertyFast(output, &successCount, tbl + countIndex);
+        csonSetPropertyFast(output, pMem, tbl + index);
+        return ERR_MISSING_FIELD;
+    } else {
+        csonSetPropertyFast(output, &val, tbl + countIndex);
+        csonSetPropertyFast(output, pMem, tbl + index);
         return ERR_NONE;
     }
 }
@@ -763,8 +858,10 @@ static void* freePointerSub(void* pData, const reflect_item_t* tbl)
 {
     if (tbl->type == CSON_ARRAY || tbl->type == CSON_STRING) {
         //log_error("free field %s.", tbl->field);
-        free(*(void**)pData);
-        *(void**)pData = NULL;
+        if ((*(void**)pData) != NULL) {
+            free(*(void**)pData);
+            *(void**)pData = NULL;
+        }
     }
     return NULL;
 }
