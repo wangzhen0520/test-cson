@@ -431,8 +431,10 @@ int parseJsonStrings(cson_t jo_tmp, void* output, const reflect_item_t* tbl, int
     const char* tempstr = cson_string_value(jo_tmp);
     if (NULL != tempstr) {
         char* pDst = (char*)output + tbl[index].offset;
-        csonSetPropertyFast(output, tempstr, tbl + index);
-        pDst[tbl[index].size - 1] = '\0';
+        size_t tempstr_len = strlen(tempstr);
+        int dst_size = tbl[index].size > tempstr_len ? tempstr_len : tbl[index].size;
+        memcpy(pDst, tempstr, dst_size);
+        pDst[dst_size - 1] = '\0';
 
         return ERR_NONE;
     }

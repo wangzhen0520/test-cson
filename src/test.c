@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <sys/time.h>
+#include <sys/timeb.h>
 
 #include "cson.h"
 #include "log.h"
@@ -132,14 +132,14 @@ reflect_item_t fiks_schema_t_ref_tbl[] = {
 
 void my_log(log_Event *ev)
 {
-    // struct timeb stTimeb;
-    // ftime(&stTimeb);
-    // char buf[1024];
-    // buf[strftime(buf, sizeof(buf), "[%Y-%m-%d %H:%M:%S", ev->time)] = '\0';
-    // snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf) - 1, ".%03d] %-5s %s::%s:%d: ", stTimeb.millitm,
-    //     log_level_string(ev->level), ev->file, ev->func, ev->line);
-    // vsnprintf(buf + strlen(buf), sizeof(buf) - strlen(buf) - 1, ev->fmt, ev->ap);
-    // printf("%s\n", buf);
+    struct timeb stTimeb;
+    ftime(&stTimeb);
+    char buf[1024];
+    buf[strftime(buf, sizeof(buf), "[%Y-%m-%d %H:%M:%S", ev->time)] = '\0';
+    snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf) - 1, ".%03d] %-5s %s::%d: ", stTimeb.millitm,
+        log_level_string(ev->level), ev->file, ev->line);
+    vsnprintf(buf + strlen(buf), sizeof(buf) - strlen(buf) - 1, ev->fmt, ev->ap);
+    printf("%s\n", buf);
 }
 
 int csonDemo()
@@ -147,9 +147,6 @@ int csonDemo()
     printf("=========================================\n");
     printf("\t\tRunning %s\n", __FUNCTION__);
     printf("=========================================\n");
-
-    log_set_quiet(true);
-    log_add_callback(my_log, NULL, LOG_TRACE);
 
     char file_name[] = "schema_all.json";
     FILE *fp = fopen(file_name, "rb");
@@ -233,12 +230,20 @@ reflect_item_t ErrorInfo_ref_tbl[] = {
     _property_end(),
 };
 
+#define USING_STRINGS 1
 typedef struct
 {
+#if USING_STRINGS
     char productId[128];
     char productKey[128];
     char securityKey[128];
     char xSource[128];
+#else
+    char *productId;
+    char *productKey;
+    char *securityKey;
+    char *xSource;
+#endif
     char *productName;
     int productSpecies;
     long long timestamp;
@@ -246,10 +251,17 @@ typedef struct
 } ProdcutInfo;
 
 reflect_item_t ProdcutInfo_ref_tbl[] = {
+#if USING_STRINGS
     _property_strings(ProdcutInfo, productId),
     _property_strings(ProdcutInfo, productKey),
     _property_strings(ProdcutInfo, securityKey),
     _property_strings(ProdcutInfo, xSource),
+#else
+    _property_string(ProdcutInfo, productId),
+    _property_string(ProdcutInfo, productKey),
+    _property_string(ProdcutInfo, securityKey),
+    _property_string(ProdcutInfo, xSource),
+#endif
     _property_string(ProdcutInfo, productName),
     _property_int(ProdcutInfo, productSpecies),
     _property_int(ProdcutInfo, timestamp),
@@ -292,6 +304,9 @@ int main(int argc, char *argv[])
     printf("=========================================\n");
     printf("\t\tRunning %s\n", __FUNCTION__);
     printf("=========================================\n");
+
+    log_set_quiet(true);
+    log_add_callback(my_log, NULL, LOG_TRACE);
 
     // csonDemo();
 
