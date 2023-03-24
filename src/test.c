@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <sys/time.h>
 
 #include "cson.h"
@@ -11,35 +12,30 @@
 typedef unsigned char uint8_t;
 
 /* Step1:定义与json相对应的数据结构 */
-typedef struct
-{
+typedef struct {
     uint8_t offset;
     uint8_t len;
     uint8_t bit_index;
 } cmd_attr_t;
 
-typedef struct
-{
+typedef struct {
     uint8_t offset;
     uint8_t len;
 } sta_attr_t;
 
-typedef struct
-{
+typedef struct {
     char *attr;
     cmd_attr_t cmd;
     sta_attr_t status;
 } attri_list;
 
-typedef struct
-{
+typedef struct {
     uint8_t offset;
     uint8_t len;
     int default_;
 } cfg_attr_t;
 
-typedef struct
-{
+typedef struct {
     cfg_attr_t head;
     cfg_attr_t type;
     cfg_attr_t payloadBitFlag;
@@ -47,19 +43,16 @@ typedef struct
     cfg_attr_t crc;
 } cmd_payload_cfg_t;
 
-typedef struct
-{
+typedef struct {
     cfg_attr_t payloadData;
 } sta_payload_cfg_t;
 
-typedef struct
-{
+typedef struct {
     sta_payload_cfg_t status;
     cmd_payload_cfg_t cmd;
 } header_info;
 
-typedef struct
-{
+typedef struct {
     char *version;
     uint8_t dataType;
     uint8_t uploadFilter;
@@ -137,7 +130,7 @@ void my_log(log_Event *ev)
     char buf[5120];
     buf[strftime(buf, sizeof(buf), "[%Y-%m-%d %H:%M:%S", ev->time)] = '\0';
     snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf) - 1, ".%03d] %-5s %s::%d: ", (int)tmval.tv_usec / 1000,
-        log_level_string(ev->level), ev->file, ev->line);
+             log_level_string(ev->level), ev->file, ev->line);
     vsnprintf(buf + strlen(buf), sizeof(buf) - strlen(buf) - 1, ev->fmt, ev->ap);
     printf("%s\n", buf);
 }
@@ -186,14 +179,15 @@ int csonDemo()
         // attri_list *attrList = gs_schema.attributeList + i;
         attri_list *attrList = &gs_schema.attributeList[i];
         log_debug("[%d] %s cmd[%d, %d, %d] status[%d, %d]", i, attrList->attr, attrList->cmd.offset, attrList->cmd.len,
-            attrList->cmd.bit_index, attrList->status.offset, attrList->status.len);
+                  attrList->cmd.bit_index, attrList->status.offset, attrList->status.len);
     }
 
     cmd_payload_cfg_t *head_cmd = &gs_schema.header.cmd;
     log_debug("head_cmd head[%d, %d, %d] type[%d, %d, %d] payloadBitFlag[%d, %d] payloadData[%d, %d] crc[%d, %d]",
-        head_cmd->head.offset, head_cmd->head.len, head_cmd->head.default_, head_cmd->type.offset, head_cmd->type.len,
-        head_cmd->type.default_, head_cmd->payloadBitFlag.offset, head_cmd->payloadBitFlag.len,
-        head_cmd->payloadData.offset, head_cmd->payloadData.len, head_cmd->crc.offset, head_cmd->crc.len);
+              head_cmd->head.offset, head_cmd->head.len, head_cmd->head.default_, head_cmd->type.offset,
+              head_cmd->type.len, head_cmd->type.default_, head_cmd->payloadBitFlag.offset,
+              head_cmd->payloadBitFlag.len, head_cmd->payloadData.offset, head_cmd->payloadData.len,
+              head_cmd->crc.offset, head_cmd->crc.len);
     sta_payload_cfg_t *head_status = &gs_schema.header.status;
     log_debug("head_status payloadData[%d, %d]", head_status->payloadData.offset, head_status->payloadData.len);
     log_debug("decode ret:%d cost: %dms", ret, cost);
@@ -220,8 +214,7 @@ int csonDemo()
     return 0;
 }
 
-typedef struct
-{
+typedef struct {
     int timeStamp;
 } ErrorInfo;
 
@@ -231,8 +224,7 @@ reflect_item_t ErrorInfo_ref_tbl[] = {
 };
 
 #define USING_STRINGS 1
-typedef struct
-{
+typedef struct {
 #if USING_STRINGS
     char productId[128];
     char productKey[128];
@@ -283,10 +275,8 @@ void csonDemo2()
         .error.timeStamp = -1,
     };
     int ret = csonJsonStr2Struct(res_data, &pdInfo, ProdcutInfo_ref_tbl);
-    log_debug("ret: %d productId: %s size:%d xSource: %s productSpecies: %d timeStamp: %lld", ret, 
-        pdInfo.productId, (int)strlen(pdInfo.productId),
-        pdInfo.xSource,
-        pdInfo.productSpecies, pdInfo.timestamp);
+    log_debug("ret: %d productId: %s size:%d xSource: %s productSpecies: %d timeStamp: %lld", ret, pdInfo.productId,
+              (int)strlen(pdInfo.productId), pdInfo.xSource, pdInfo.productSpecies, pdInfo.timestamp);
 
     char *jstrOutput = NULL;
     ret = csonStruct2JsonStr(&jstrOutput, &pdInfo, ProdcutInfo_ref_tbl);
@@ -309,9 +299,14 @@ int main(int argc, char *argv[])
     log_set_quiet(true);
     log_add_callback(my_log, NULL, LOG_TRACE);
 
-    csonDemo();
+    int cnt = 1;
+    while (cnt-- > 0) {
+        csonDemo();
 
-    // csonDemo2();
+        csonDemo2();
+
+        usleep(100 * 1000);
+    }
 
     return 0;
 }
