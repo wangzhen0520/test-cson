@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <sys/time.h>
 
 #include "cson.h"
 #include "log.h"
@@ -131,14 +132,14 @@ reflect_item_t fiks_schema_t_ref_tbl[] = {
 
 void my_log(log_Event *ev)
 {
-    struct timeb stTimeb;
-    ftime(&stTimeb);
-    char buf[1024];
-    buf[strftime(buf, sizeof(buf), "[%Y-%m-%d %H:%M:%S", ev->time)] = '\0';
-    snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf) - 1, ".%03d] %-5s %s::%s:%d: ", stTimeb.millitm,
-        log_level_string(ev->level), ev->file, ev->func, ev->line);
-    vsnprintf(buf + strlen(buf), sizeof(buf) - strlen(buf) - 1, ev->fmt, ev->ap);
-    printf("%s\n", buf);
+    // struct timeb stTimeb;
+    // ftime(&stTimeb);
+    // char buf[1024];
+    // buf[strftime(buf, sizeof(buf), "[%Y-%m-%d %H:%M:%S", ev->time)] = '\0';
+    // snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf) - 1, ".%03d] %-5s %s::%s:%d: ", stTimeb.millitm,
+    //     log_level_string(ev->level), ev->file, ev->func, ev->line);
+    // vsnprintf(buf + strlen(buf), sizeof(buf) - strlen(buf) - 1, ev->fmt, ev->ap);
+    // printf("%s\n", buf);
 }
 
 int csonDemo()
@@ -271,7 +272,7 @@ void csonDemo2()
     };
     int ret = csonJsonStr2Struct(res_data, &pdInfo, ProdcutInfo_ref_tbl);
     printf("ret: %d productId: %s size:%d xSource: %s productSpecies: %d timeStamp: %lld\n", ret, 
-        pdInfo.productId, strlen(pdInfo.productId),
+        pdInfo.productId, (int)strlen(pdInfo.productId),
         pdInfo.xSource,
         pdInfo.productSpecies, pdInfo.timestamp);
 

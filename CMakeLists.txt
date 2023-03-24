@@ -35,7 +35,7 @@ include_directories(
   ./src
   ${CMAKE_CURRENT_SOURCE_DIR}/cson/inc
   ${CMAKE_CURRENT_SOURCE_DIR}/cson/cjson
-  ${CMAKE_CURRENT_SOURCE_DIR}/log
+  ${CMAKE_CURRENT_SOURCE_DIR}/3rd/log/log.c/src
 )
 
 # 添加源代码文件夹, 自动扫描所有文件
@@ -45,11 +45,11 @@ aux_source_directory(./cson/src DIR_SRCS)
 aux_source_directory(./cson/cjson DIR_SRCS)
 
 # 添加子工程
-add_subdirectory(log)
+add_subdirectory(3rd)
 
 # link_directories(${LIBRARY_OUTPUT_PATH})
 
 add_executable(${TRAGET_NAME} ${DIR_SRCS})
 
 # 链接子工程
-target_link_libraries(${TRAGET_NAME} PRIVATE -lm log)
+target_link_libraries(${TRAGET_NAME} PRIVATE -lm log.c)
