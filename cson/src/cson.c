@@ -768,7 +768,6 @@ const reflect_item_t* getReflexItem(const char* field, const reflect_item_t* tbl
 
     for (int i = 0;; i++) {
         if (!(tbl[i].field)) break;
-        // log_error("[%s:%d] %d field:%s tbl.field: %s", __FILE__, __LINE__, i, field, tbl[i].field);
         if (strcmp(field, tbl[i].field) == 0) {
             ret = &(tbl[i]);
 
@@ -777,7 +776,7 @@ const reflect_item_t* getReflexItem(const char* field, const reflect_item_t* tbl
         }
     }
 
-    if (!ret) log_error("[%s:%d] Can not find field:%s.", __FILE__, __LINE__, field);
+    if (!ret) log_error("[%s:%d] Can not find field:%s.", field);
 
     return ret;
 }
