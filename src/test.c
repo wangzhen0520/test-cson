@@ -3,8 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
-#include <sys/timeb.h>
+#include <sys/time.h>
 
 #include "cson.h"
 #include "log.h"
@@ -132,11 +131,12 @@ reflect_item_t fiks_schema_t_ref_tbl[] = {
 
 void my_log(log_Event *ev)
 {
-    struct timeb stTimeb;
-    ftime(&stTimeb);
-    char buf[1024];
+    struct timeval tmval = {};
+    gettimeofday(&tmval, NULL);
+
+    char buf[5120];
     buf[strftime(buf, sizeof(buf), "[%Y-%m-%d %H:%M:%S", ev->time)] = '\0';
-    snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf) - 1, ".%03d] %-5s %s::%d: ", stTimeb.millitm,
+    snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf) - 1, ".%03d] %-5s %s::%d: ", (int)tmval.tv_usec / 1000,
         log_level_string(ev->level), ev->file, ev->line);
     vsnprintf(buf + strlen(buf), sizeof(buf) - strlen(buf) - 1, ev->fmt, ev->ap);
     printf("%s\n", buf);
@@ -144,9 +144,9 @@ void my_log(log_Event *ev)
 
 int csonDemo()
 {
-    printf("=========================================\n");
-    printf("\t\tRunning %s\n", __FUNCTION__);
-    printf("=========================================\n");
+    log_info("=========================================");
+    log_info("\t\tRunning %s", __FUNCTION__);
+    log_info("=========================================");
 
     char file_name[] = "schema_all.json";
     FILE *fp = fopen(file_name, "rb");
@@ -170,7 +170,7 @@ int csonDemo()
         fp = NULL;
     }
 
-    // printf("\nschema.json:\n%s\n", buf);
+    // log_info("\nschema.json:\n%s", buf);
 
     clock_t begin = clock();
     fiks_schema_t gs_schema = {};
@@ -181,30 +181,30 @@ int csonDemo()
     int ret = csonJsonStr2Struct(buf, &gs_schema, fiks_schema_t_ref_tbl);
     clock_t end = clock();
     int cost = end - begin;
-    printf("attrNum:%d\n", gs_schema.attrNum);
+    log_debug("attrNum:%d", gs_schema.attrNum);
     for (int i = 0; i < gs_schema.attrNum; i++) {
         // attri_list *attrList = gs_schema.attributeList + i;
         attri_list *attrList = &gs_schema.attributeList[i];
-        printf("[%d] %s cmd[%d, %d, %d] status[%d, %d]\n", i, attrList->attr, attrList->cmd.offset, attrList->cmd.len,
+        log_debug("[%d] %s cmd[%d, %d, %d] status[%d, %d]", i, attrList->attr, attrList->cmd.offset, attrList->cmd.len,
             attrList->cmd.bit_index, attrList->status.offset, attrList->status.len);
     }
 
     cmd_payload_cfg_t *head_cmd = &gs_schema.header.cmd;
-    printf("head_cmd head[%d, %d, %d] type[%d, %d, %d] payloadBitFlag[%d, %d] payloadData[%d, %d] crc[%d, %d]\n",
+    log_debug("head_cmd head[%d, %d, %d] type[%d, %d, %d] payloadBitFlag[%d, %d] payloadData[%d, %d] crc[%d, %d]",
         head_cmd->head.offset, head_cmd->head.len, head_cmd->head.default_, head_cmd->type.offset, head_cmd->type.len,
         head_cmd->type.default_, head_cmd->payloadBitFlag.offset, head_cmd->payloadBitFlag.len,
         head_cmd->payloadData.offset, head_cmd->payloadData.len, head_cmd->crc.offset, head_cmd->crc.len);
     sta_payload_cfg_t *head_status = &gs_schema.header.status;
-    printf("head_status payloadData[%d, %d]\n", head_status->payloadData.offset, head_status->payloadData.len);
-    printf("decode ret:%d cost: %dms\n", ret, cost);
+    log_debug("head_status payloadData[%d, %d]", head_status->payloadData.offset, head_status->payloadData.len);
+    log_debug("decode ret:%d cost: %dms", ret, cost);
 
     begin = clock();
     char *jstrOutput = NULL;
     ret = csonStruct2JsonStr(&jstrOutput, &gs_schema, fiks_schema_t_ref_tbl);
     end = clock();
     cost = end - begin;
-    printf("encode json:\n%s\n", jstrOutput);
-    printf("encode ret: %d cost: %dms\n", ret, cost);
+    log_debug("encode size[%d] json:\n%s", strlen(jstrOutput), jstrOutput);
+    log_debug("encode ret: %d cost: %dms", ret, cost);
 
     csonFreePointer(&gs_schema, fiks_schema_t_ref_tbl);
 
@@ -283,14 +283,15 @@ void csonDemo2()
         .error.timeStamp = -1,
     };
     int ret = csonJsonStr2Struct(res_data, &pdInfo, ProdcutInfo_ref_tbl);
-    printf("ret: %d productId: %s size:%d xSource: %s productSpecies: %d timeStamp: %lld\n", ret, 
+    log_debug("ret: %d productId: %s size:%d xSource: %s productSpecies: %d timeStamp: %lld", ret, 
         pdInfo.productId, (int)strlen(pdInfo.productId),
         pdInfo.xSource,
         pdInfo.productSpecies, pdInfo.timestamp);
 
     char *jstrOutput = NULL;
     ret = csonStruct2JsonStr(&jstrOutput, &pdInfo, ProdcutInfo_ref_tbl);
-    printf("encode ret: %d jstrOutput: %s\n", ret, jstrOutput);
+    log_debug("encode ret: %d", ret);
+    log_debug("encode size[%d] jstrOutput: %s", strlen(jstrOutput), jstrOutput);
 
     if (jstrOutput != NULL) {
         free(jstrOutput);
@@ -301,16 +302,16 @@ void csonDemo2()
 
 int main(int argc, char *argv[])
 {
-    printf("=========================================\n");
-    printf("\t\tRunning %s\n", __FUNCTION__);
-    printf("=========================================\n");
+    log_info("=========================================");
+    log_info("\t\tRunning %s", __FUNCTION__);
+    log_info("=========================================");
 
     log_set_quiet(true);
     log_add_callback(my_log, NULL, LOG_TRACE);
 
-    // csonDemo();
+    csonDemo();
 
-    csonDemo2();
+    // csonDemo2();
 
     return 0;
 }

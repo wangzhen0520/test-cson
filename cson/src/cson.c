@@ -821,7 +821,7 @@ void csonLoopProperty(void* pData, const reflect_item_t* tbl, loop_func_t func)
         if (!tbl[i].field) break;
 
         char* pProperty = (char*)pData + tbl[i].offset;
-        if (tbl[i].type == CSON_ARRAY) {
+        if (tbl[i].type == CSON_ARRAY || tbl[i].type == CSON_ARRAYS) {
             int countIndex = -1;
             void* ptr = csonGetProperty(pData, tbl[i].arrayCountField, tbl, &countIndex);
 
@@ -831,7 +831,8 @@ void csonLoopProperty(void* pData, const reflect_item_t* tbl, loop_func_t func)
             long long size = getIntegerValueFromPointer(ptr, tbl[countIndex].size);
 
             for (long long j = 0; j < size; j++) {
-                csonLoopProperty(*((char**)pProperty) + j * tbl[i].arrayItemSize, tbl[i].reflect_tbl, func);
+                void *pData = (tbl[i].type == CSON_ARRAY) ? (void *)&pProperty : (void *)pProperty;
+                csonLoopProperty((char *)pData + j * tbl[i].arrayItemSize, tbl[i].reflect_tbl, func);
             }
         } else if (tbl[i].type == CSON_OBJECT) {
             csonLoopProperty(pProperty, tbl[i].reflect_tbl, func);
@@ -845,13 +846,15 @@ void csonLoopProperty(void* pData, const reflect_item_t* tbl, loop_func_t func)
 
 static void* printPropertySub(void* pData, const reflect_item_t* tbl)
 {
-    if (tbl->type == CSON_ARRAY || tbl->type == CSON_OBJECT) return NULL;
+    if (tbl->type == CSON_ARRAY || tbl->type == CSON_ARRAYS || tbl->type == CSON_OBJECT) return NULL;
 
     if (tbl->type == CSON_INTEGER || tbl->type == CSON_TRUE || tbl->type == CSON_FALSE) log_error("%s:%d", tbl->field, *(int*)pData);
 
     if (tbl->type == CSON_REAL) log_error("%s:%f", tbl->field, *(double*)pData);
 
     if (tbl->type == CSON_STRING) log_error("%s:%s", tbl->field, *((char**)pData));
+
+    if (tbl->type == CSON_STRINGS) log_error("%s:%s", tbl->field, (char*)pData);
 
     return NULL;
 }
