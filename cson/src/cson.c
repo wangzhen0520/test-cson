@@ -768,7 +768,6 @@ const reflect_item_t* getReflexItem(const char* field, const reflect_item_t* tbl
 
     for (int i = 0;; i++) {
         if (!(tbl[i].field)) break;
-        // log_error("[%s:%d] %d field:%s tbl.field: %s", __FILE__, __LINE__, i, field, tbl[i].field);
         if (strcmp(field, tbl[i].field) == 0) {
             ret = &(tbl[i]);
 
@@ -777,7 +776,7 @@ const reflect_item_t* getReflexItem(const char* field, const reflect_item_t* tbl
         }
     }
 
-    if (!ret) log_error("[%s:%d] Can not find field:%s.", __FILE__, __LINE__, field);
+    if (!ret) log_error("Can not find field:%s.", field);
 
     return ret;
 }
@@ -831,8 +830,8 @@ void csonLoopProperty(void* pData, const reflect_item_t* tbl, loop_func_t func)
             long long size = getIntegerValueFromPointer(ptr, tbl[countIndex].size);
 
             for (long long j = 0; j < size; j++) {
-                void *pData = (tbl[i].type == CSON_ARRAY) ? (void *)&pProperty : (void *)pProperty;
-                csonLoopProperty((char *)pData + j * tbl[i].arrayItemSize, tbl[i].reflect_tbl, func);
+                char *pData = (tbl[i].type == CSON_ARRAY) ? *((char**)pProperty) : (char *)pProperty;
+                csonLoopProperty((char *)pData + j * tbl[i].arrayItemSize, tbl[i].reflect_tbl, func);              
             }
         } else if (tbl[i].type == CSON_OBJECT) {
             csonLoopProperty(pProperty, tbl[i].reflect_tbl, func);
@@ -862,7 +861,7 @@ static void* printPropertySub(void* pData, const reflect_item_t* tbl)
 static void* freePointerSub(void* pData, const reflect_item_t* tbl)
 {
     if (tbl->type == CSON_ARRAY || tbl->type == CSON_STRING) {
-        //log_error("free field %s.", tbl->field);
+        // log_error("free field %s.", tbl->field);
         if ((*(void**)pData) != NULL) {
             free(*(void**)pData);
             *(void**)pData = NULL;
