@@ -190,8 +190,10 @@ extern const reflect_item_t realReflectTbl[];
 #define _property_arrays2(type, field, field_name, tbl, subType, count_name)         {field_name, _offset(type, field), _size(type, field), CSON_ARRAYS, tbl, sizeof(subType), count_name, _ex_args_nullable}
 #define _property_array_object(type, field, tbl, subType, count)            _property_array(type, field, tbl, subType, count)
 #define _property_array_object2(type, field, field_name, tbl, subType, count_name)            _property_array2(type, field, field_name, tbl, subType, count_name)
+#define _property_array_objects2(type, field, field_name, tbl, subType, count_name)            _property_arrays2(type, field, field_name, tbl, subType, count_name)
 #define _property_array_int(type, field, subType, count)                    _property_array(type, field, integerReflectTbl, subType, count)
 #define _property_array_int2(type, field, field_name, subType, count_name)                    _property_array2(type, field, field_name, integerReflectTbl, subType, count_name)
+#define _property_array_ints2(type, field, field_name, subType, count_name)                    _property_arrays2(type, field, field_name, integerReflectTbl, subType, count_name)
 #define _property_array_string(type, field, subType, count)                 _property_array(type, field, stringReflectTbl, subType, count)
 #define _property_array_string2(type, field, field_name, subType, count_name)                 _property_array2(type, field, field_name, stringReflectTbl, subType, count_name)
 #define _property_array_real(type, field, subType, count)                   _property_array(type, field, realReflectTbl, subType, count)

@@ -481,6 +481,8 @@ int parseJsonArray(cson_t jo_tmp, void* output, const reflect_item_t* tbl, int i
     char* pMem = (char*)malloc(arraySize * tbl[index].arrayItemSize);
     if (pMem == NULL) return ERR_MEMORY;
 
+    log_error("field: %s %d pMem: %p", tbl[index].field, arraySize, pMem);
+
     memset(pMem, 0, arraySize * tbl[index].arrayItemSize);
 
     long long successCount = 0;
@@ -505,6 +507,8 @@ int parseJsonArray(cson_t jo_tmp, void* output, const reflect_item_t* tbl, int i
     if (convertInteger(successCount, tbl[countIndex].size, &val) != ERR_NONE) {
         successCount = 0;
     }
+
+    log_error("successCount %d", successCount);
 
     if (successCount == 0) {
         csonSetPropertyFast(output, &successCount, tbl + countIndex);
@@ -566,6 +570,8 @@ int parseJsonArrays(cson_t jo_tmp, void* output, const reflect_item_t* tbl, int 
     if (convertInteger(successCount, tbl[countIndex].size, &val) != ERR_NONE) {
         successCount = 0;
     }
+
+    log_error("successCount 222 %d", successCount);
 
     if (successCount == 0) {
         csonSetPropertyFast(output, &successCount, tbl + countIndex);
@@ -728,11 +734,11 @@ int checkInteger(long long val, int size)
         return ERR_OVERFLOW;
     }
 
-    if (size == sizeof(char) && (val > CHAR_MAX || val < CHAR_MIN)) {
+    if (size == sizeof(char) && (val > UCHAR_MAX || val < CHAR_MIN)) {
         return ERR_OVERFLOW;
-    } else if (size == sizeof(short) && (val > SHRT_MAX || val < SHRT_MIN)) {
+    } else if (size == sizeof(short) && (val > USHRT_MAX || val < SHRT_MIN)) {
         return ERR_OVERFLOW;
-    } else if (size == sizeof(int)  && (val > INT_MAX || val < INT_MIN)) {
+    } else if (size == sizeof(int)  && (val > UINT_MAX || val < INT_MIN)) {
         return ERR_OVERFLOW;
     } else {
     }
@@ -861,8 +867,10 @@ static void* printPropertySub(void* pData, const reflect_item_t* tbl)
 static void* freePointerSub(void* pData, const reflect_item_t* tbl)
 {
     if (tbl->type == CSON_ARRAY || tbl->type == CSON_STRING) {
-        // log_error("free field %s.", tbl->field);
+        log_error("free field %s.", tbl->field);
+        // if (strcmp(tbl->field, "CycleList") == 0) { return NULL;}
         if ((*(void**)pData) != NULL) {
+            log_error("free %p.", *(void**)pData);
             free(*(void**)pData);
             *(void**)pData = NULL;
         }
