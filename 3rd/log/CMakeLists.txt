@@ -10,4 +10,5 @@ aux_source_directory(./log.c/src LOG_SRCS)
 
 add_library(${PROJECT_NAME} STATIC ${LOG_SRCS})
 
+
 target_include_directories(${PROJECT_NAME} PUBLIC log.c)

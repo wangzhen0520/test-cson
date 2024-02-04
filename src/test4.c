@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "cson.h"
-
+#if 0
 typedef struct
 {
     uint32_t year;
@@ -53,7 +53,7 @@ cycle_date_info gs_time_heat_date_info = {
     .timeOn = 0xffff,
     .timeOff = 0xffff,
 };
-int parse_time_heat_cycle_date_info(char *msg)
+static int parse_time_heat_cycle_date_info(char *msg)
 {
     // 先释放内存
     csonFreePointer(&gs_time_heat_date_info, wp_cycle_time_heat_date_info_ref_tbl);
@@ -89,3 +89,4 @@ void test4()
     printf("~~~~~~~~~\n");
     parse_time_heat_cycle_date_info(msg);
 }
+#endif

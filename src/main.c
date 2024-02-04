@@ -477,7 +477,7 @@ time_t mymktime2(struct tm *_Tm)
     return ((((unsigned long)(year / 4 - year / 100 + year / 400 + 367 * mon / 12 + day) + year * 365 - 719499) * 24 +
                 hour /* now have hours */
                 ) * 60 +
-               min   /* now have minutes */
+               min /* now have minutes */
                ) *
                60 +
            sec - time_difference; /* finally seconds .time_difference是我加入的，刚好差了8小时 */
@@ -633,6 +633,9 @@ extern void test1();
 extern void test2();
 extern void test3();
 extern void test4();
+extern void test5();
+extern void test6();
+extern void test7();
 int main(int argc, char *argv[])
 {
     log_info("=========================================");
@@ -644,19 +647,20 @@ int main(int argc, char *argv[])
 
     int cnt = 1;
     while (cnt-- > 0) {
-        for (size_t i = 1970; i < 2023; i++) {
-            struct tm tm = {0};
-            tm.tm_year = i - 1900;
-            tm.tm_mon = 1 - 1;
-            tm.tm_mday = 1;
-            tm.tm_isdst = -1;
-            int y = 0, w = 0;
-            int err = tm_YearWeek(&tm, &y, &w);
-            printf("Err:%d  Year:%d  Week:%d %02d%02d\n", err, y, w, y % 100, w);
-            printf("~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n");
-        }
+        // for (size_t i = 1970; i < 2023; i++) {
+        //     struct tm tm = {0};
+        //     tm.tm_year = i - 1900;
+        //     tm.tm_mon = 1 - 1;
+        //     tm.tm_mday = 1;
+        //     tm.tm_isdst = -1;
+        //     int y = 0, w = 0;
+        //     int err = tm_YearWeek(&tm, &y, &w);
+        //     printf("Err:%d  Year:%d  Week:%d %02d%02d\n", err, y, w, y % 100, w);
+        //     printf("~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n");
+        // }
 
         // test_week();
+
         // csonDemo();
 
         // csonDemo2();
@@ -670,6 +674,12 @@ int main(int argc, char *argv[])
         // test3();
 
         // test4();
+
+        // test5();
+
+        // test6();
+
+        test7();
 
         usleep(100 * 1000);
     }

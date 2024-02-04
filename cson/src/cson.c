@@ -825,12 +825,14 @@ void csonLoopProperty(void* pData, const reflect_item_t* tbl, loop_func_t func)
     while (1) {
         if (!tbl[i].field) break;
 
+        printf("field: %s\n", tbl[i].field);
         char* pProperty = (char*)pData + tbl[i].offset;
         if (tbl[i].type == CSON_ARRAY || tbl[i].type == CSON_ARRAYS) {
             int countIndex = -1;
             void* ptr = csonGetProperty(pData, tbl[i].arrayCountField, tbl, &countIndex);
 
             if (ptr == NULL || countIndex == -1) {
+                // i++;
                 continue;
             }
             long long size = getIntegerValueFromPointer(ptr, tbl[countIndex].size);

@@ -109,14 +109,14 @@ void format_route_list_to_json()
                 //     buf, sizeof(buf), "%04x", util_ld_u32_be(gs_route_list.route_info[router_num].gateway_addr));
                 int ret_size = snprintf(buf, sizeof(buf), "%04x", gs_route_list.route_info[router_num].gateway_addr);
                 // FIKS_LOG_IF_FAIL(ret_size >= 0, "snprintf failed, ret_size: %d", ret_size);
-                cJSON_AddStringToObject(route_list, "gwMac", buf);
-                cJSON_AddItemToObject(route_list, "cs", parent[router_num]);
-            } else {                                      // 其他节点
+                cJSON_AddStringToObject(route_list, "GwMac", buf);
+                cJSON_AddItemToObject(route_list, "P", parent[router_num]);
+            } else { // 其他节点
                 index = get_route_index_by_addr(gs_route_list.route_info[i].router_addr[router_num - 1]);
                 if (index >= 0 && child[index] == NULL) { // 如果没有找到则创建父节点
                     child[index] = cJSON_CreateObject();
                 }
-                cJSON_AddItemToObject(child[index], "cs", parent[router_num]);
+                cJSON_AddItemToObject(child[index], "P", parent[router_num]);
             }
         }
         if (child[i] == NULL) {
@@ -126,7 +126,7 @@ void format_route_list_to_json()
         int ret_size =
             snprintf(buf, sizeof(buf), "%u-%u", gs_route_list.route_info[i].room, gs_route_list.route_info[i].floor);
         // FIKS_LOG_IF_FAIL(ret_size >= 0, "snprintf failed, ret_size: %d", ret_size);
-        cJSON_AddItemToObject(child[i], "f", cJSON_CreateString(buf));
+        cJSON_AddItemToObject(child[i], "F", cJSON_CreateString(buf));
     }
 
     cJSON *report = cJSON_CreateObject();
@@ -243,7 +243,7 @@ void test3()
     // printf("%d\n", strtol(p, NULL, 16));
 #endif
 
-#if 1
+#if 0
     // ft_uart_payload_of_whitelist_s orig = {};
     // orig.dest_addr_num = 8;
     // for (uint16_t i = 0; i < orig.dest_addr_num; i++) {
