@@ -430,212 +430,11 @@ void csonDemo3()
     csonFreePointer(&schema, fiks_schema_t_ref_tbl);
 }
 
-#include <stdio.h>
-
-int is_leap_year(int year)
-{
-    return (year % 4 == 0 && year % 100 != 0) || year % 400 == 0;
-}
-
-int test_week()
-{
-    int year, month, day;
-    printf("请输入日期（年 月 日）：");
-    scanf("%d %d %d", &year, &month, &day);
-
-    int days_in_month[] = {31, 28 + is_leap_year(year), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-
-    int yday = 0;
-    for (int i = 1; i < month; i++) {
-        yday += days_in_month[i - 1];
-    }
-    yday += day;
-
-    int weekday = (yday + 10) % 7;
-    int week = (yday + 10 - weekday) / 7;
-
-    printf("当前是第%d周\n", week);
-
-    return 0;
-}
-
-time_t time_difference = 8 * 3600;
-time_t mymktime2(struct tm *_Tm)
-{
-    int year = _Tm->tm_year + 1900;
-    int mon = _Tm->tm_mon + 1;
-    int day = _Tm->tm_mday;
-    int hour = _Tm->tm_hour;
-    int min = _Tm->tm_min;
-    int sec = _Tm->tm_sec;
-
-    if (0 >= (int)(mon -= 2)) { /* 1..12 -> 11,12,1..10 */
-        mon += 12;              /* Puts Feb last since it has leap day */
-        year -= 1;
-    }
-
-    return ((((unsigned long)(year / 4 - year / 100 + year / 400 + 367 * mon / 12 + day) + year * 365 - 719499) * 24 +
-                hour /* now have hours */
-                ) * 60 +
-               min /* now have minutes */
-               ) *
-               60 +
-           sec - time_difference; /* finally seconds .time_difference是我加入的，刚好差了8小时 */
-}
-
-#define SECOND_OF_DAY (24 * 60 * 60)
-
-static const char DayOfMon[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-
-void ft_time_to_date(uint64_t sec, struct tm *t)
-{
-    unsigned short i, j, iDay;
-    unsigned long lDay;
-
-    lDay = sec / SECOND_OF_DAY;
-    sec = sec % SECOND_OF_DAY;
-
-    i = 1970;
-    while (lDay > 365) {
-        if (((i % 4 == 0) && (i % 100 != 0)) || (i % 400 == 0)) {
-            lDay -= 366;
-        } else {
-            lDay -= 365;
-        }
-        i++;
-    }
-    if ((lDay == 365) && !(((i % 4 == 0) && (i % 100 != 0)) || (i % 400 == 0))) {
-        lDay -= 365;
-        i++;
-    }
-    t->tm_year = i;
-    for (j = 0; j < 12; j++) {
-        if ((j == 1) && (((i % 4 == 0) && (i % 100 != 0)) || (i % 400 == 0))) {
-            iDay = 29;
-        } else {
-            iDay = DayOfMon[j];
-        }
-        if (lDay >= iDay) {
-            lDay -= iDay;
-        } else {
-            break;
-        }
-    }
-    t->tm_mon = j;
-    t->tm_mday = lDay + 1;
-    t->tm_hour = ((sec / 3600)) % 24; // 这里注意，世界时间已经加上北京时间差8，
-    t->tm_min = (sec % 3600) / 60;
-    t->tm_sec = (sec % 3600) % 60;
-}
-
-uint8_t ft_time_to_weekday(struct tm *t)
-{
-    uint32_t u32WeekDay = 0;
-    uint32_t u32Year = t->tm_year;
-    uint8_t u8Month = t->tm_mon + 1;
-    uint8_t u8Day = t->tm_mday;
-    if (u8Month < 3U) {
-        /*D = { [(23 x month) / 9] + day + 4 + year + [(year - 1) / 4] - [(year - 1) / 100] + [(year - 1) / 400] } mod
-         * 7*/
-        u32WeekDay = (((23U * u8Month) / 9U) + u8Day + 4U + u32Year + ((u32Year - 1U) / 4U) - ((u32Year - 1U) / 100U) +
-                         ((u32Year - 1U) / 400U)) %
-                     7U;
-    } else {
-        /*D = { [(23 x month) / 9] + day + 4 + year + [year / 4] - [year / 100] + [year / 400] - 2 } mod 7*/
-        u32WeekDay = (((23U * u8Month) / 9U) + u8Day + 4U + u32Year + (u32Year / 4U) - (u32Year / 100U) +
-                         (u32Year / 400U) - 2U) %
-                     7U;
-    }
-
-    if (0U == u32WeekDay) {
-        u32WeekDay = 7U;
-    }
-
-    return (uint8_t)u32WeekDay - 1;
-}
-
-int ft_time_to_yearweek(struct tm *t, int weekday)
-{
-    int iLeap = 0;
-    static const int ppiYearDays[2][13] = {
-        /* Normal year */
-        {0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334},
-        /* Leap year */
-        {0, 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335},
-    };
-    /* Check for leap year */
-    if (((t->tm_year % 4) == 0) && (((t->tm_year % 100) != 0) || ((t->tm_year % 400) == 0))) {
-        iLeap = 1;
-    }
-    /* Calculate the year week */
-    int year_day = ppiYearDays[iLeap][t->tm_mon + 1] + t->tm_mday - 1;
-    printf("mon: %d weekday: %d iLeap: %d year_day: %d\n", t->tm_mon + 1, weekday, iLeap, year_day);
-
-    printf("week_num: %d\n", (year_day - weekday + 10) / 7);
-
-    return ((year_day - (weekday + 7) % 7 + 7) / 7) + 1;
-}
-
-// return 1 on failure, 0 on success
-int tm_YearWeek(const struct tm *tmptr, int *year, int *week)
-{
-    // work with local copy
-    struct tm tm = *tmptr;
-    // fully populate the yday and wday fields.
-    time_t t = mktime(&tm);
-    if (t == -1) {
-        return 1;
-    }
-    printf("t111: %u %u %u %u %u %u %u %u\n", tm.tm_year, tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec,
-        tm.tm_yday, tm.tm_wday);
-
-    time_t t2 = mymktime2(&tm);
-    printf("t: %u %u\n", t, t2);
-
-    // Find day-of-the-week: 0 to 6.
-    // Week starts on Monday per ISO 8601
-    // 0 <= DayOfTheWeek <= 6, Monday, Tuesday ... Sunday
-    int DayOfTheWeek = (tm.tm_wday + (7 - 1)) % 7;
-
-    // Offset the month day to the Monday of the week.
-    tm.tm_mday -= DayOfTheWeek;
-    // Offset the month day to the mid-week (Thursday) of the week, 3 days later.
-    tm.tm_mday += 3;
-    // Re-evaluate tm_year and tm_yday  (local time)
-    t = mktime(&tm);
-    if (t == -1) {
-        return 1;
-    }
-    printf("t222: %u %u %u %u %u %u %u %u\n", tm.tm_year, tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec,
-        tm.tm_yday, tm.tm_wday);
-
-    t2 = mymktime2(&tm);
-    printf("t: %u %u\n", t, t2);
-
-    struct tm ttt2;
-    ft_time_to_date(t2 + 8 * 3600, &ttt2);
-    printf("ttt2: %u %u %u %u %u %u\n", ttt2.tm_year - 1900, ttt2.tm_mon, ttt2.tm_mday, ttt2.tm_hour, ttt2.tm_min,
-        ttt2.tm_sec);
-
-    int week_day = ft_time_to_weekday(&ttt2);
-    printf("week_day: %d\n", week_day);
-
-    int year_week = ft_time_to_yearweek(&ttt2, week_day);
-    printf("year_week: %d\n", year_week);
-
-    *year = tm.tm_year + 1900;
-    // Convert yday to week of the year, stating with 1.
-    *week = tm.tm_yday / 7 + 1;
-    return 0;
-}
-
 extern void test1();
 extern void test2();
 extern void test3();
 extern void test4();
 extern void test5();
-extern void test6();
-extern void test7();
 int main(int argc, char *argv[])
 {
     log_info("=========================================");
@@ -647,18 +446,6 @@ int main(int argc, char *argv[])
 
     int cnt = 1;
     while (cnt-- > 0) {
-        // for (size_t i = 1970; i < 2023; i++) {
-        //     struct tm tm = {0};
-        //     tm.tm_year = i - 1900;
-        //     tm.tm_mon = 1 - 1;
-        //     tm.tm_mday = 1;
-        //     tm.tm_isdst = -1;
-        //     int y = 0, w = 0;
-        //     int err = tm_YearWeek(&tm, &y, &w);
-        //     printf("Err:%d  Year:%d  Week:%d %02d%02d\n", err, y, w, y % 100, w);
-        //     printf("~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n");
-        // }
-
         // test_week();
 
         // csonDemo();
@@ -674,6 +461,8 @@ int main(int argc, char *argv[])
         // test3();
 
         // test4();
+        
+        // test5();
 
         // test5();
 
