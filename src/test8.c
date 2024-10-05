@@ -1,4 +1,6 @@
 #include "cson.h"
+#include <stdio.h>
+#include <string.h>
 
 typedef struct
 {
@@ -11,6 +13,7 @@ typedef struct
     char *minutePic;
     char *secondPic;
     int mendian;
+    int theme;
 } BgDetailList;
 
 typedef struct
@@ -33,29 +36,31 @@ typedef struct
 } BgData;
 
 reflect_item_t bg_detail_list_ref_tbl[] = {
-    _property_string_ex(BgDetailList, path, _ex_args_all),
-    _property_string_ex(BgDetailList, thumb, _ex_args_all),
-    _property_string_ex(BgDetailList, bigPic, _ex_args_all),
-    _property_string_ex(BgDetailList, video, _ex_args_all),
-    _property_string_ex(BgDetailList, clockBgPic, _ex_args_all),
-    _property_string_ex(BgDetailList, hourPic, _ex_args_all),
-    _property_string_ex(BgDetailList, minutePic, _ex_args_all),
-    _property_string_ex(BgDetailList, secondPic, _ex_args_all),
-    _property_int_ex(BgDetailList, mendian, _ex_args_all),
+    _property_string(BgDetailList, path),
+    _property_string(BgDetailList, thumb),
+    _property_string(BgDetailList, bigPic),
+    _property_string(BgDetailList, video),
+    _property_string(BgDetailList, clockBgPic),
+    _property_string(BgDetailList, hourPic),
+    _property_string(BgDetailList, minutePic),
+    _property_string(BgDetailList, secondPic),
+    _property_int(BgDetailList, mendian),
+    _property_int(BgDetailList, theme),
     _property_end(),
 };
 
 reflect_item_t bg_info_ref_tbl[] = {
-    _property_int_ex(BgInfo, index, _ex_args_all),
-    _property_string_ex(BgInfo, name, _ex_args_all),
-    _property_string_ex(BgInfo, coverPath, _ex_args_all),
+    _property_int(BgInfo, index),
+    _property_string(BgInfo, name),
+    _property_string(BgInfo, coverPath),
+    _property_int_ex(BgInfo, listNum, _ex_args_all),
     _property_array_object(BgInfo, list, bg_detail_list_ref_tbl, BgDetailList, listNum),
     _property_end(),
 };
 
 reflect_item_t bg_data_ref_tbl[] = {
     _property_int_ex(BgData, lockTimeNum, _ex_args_all),
-    _property_array_int2(BgData, lockTime, "lockTime", int, "lockTimeNum"),
+    _property_array_int(BgData, lockTime, int, lockTimeNum),
     _property_int_ex(BgData, bginfoNum, _ex_args_all),
     _property_array_object(BgData, bginfo, bg_info_ref_tbl, BgInfo, bginfoNum),
     _property_end(),
@@ -105,12 +110,11 @@ void test8()
     int ret = csonJsonStr2Struct(jStr, &resp, bg_data_ref_tbl);
     printf("decode ret=%d\n", ret);
 
-
     printf("decode lockTimeNum=%d\n", resp.lockTimeNum);
     printf("decode bginfoNum=%d\n", resp.bginfoNum);
 
     /* test print */
-    // csonPrintProperty(&resp, bg_data_ref_tbl);
+    csonPrintProperty(&resp, bg_data_ref_tbl);
 
     printf("Successed %s.\n", __FUNCTION__);
 }
