@@ -37,6 +37,9 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/cson/cjson
   ${CMAKE_CURRENT_SOURCE_DIR}/3rd/log/log.c/src
   ${CMAKE_CURRENT_SOURCE_DIR}/3rd/easylogger/inc  
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/helix_mp3_for_windows/  
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/helix_mp3_for_windows/real
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/helix_mp3_for_windows/pub  
 )
 
 # 添加源代码文件夹, 自动扫描所有文件
@@ -44,6 +47,9 @@ aux_source_directory(. DIR_SRCS)
 aux_source_directory(./src DIR_SRCS)
 aux_source_directory(./cson/src DIR_SRCS)
 aux_source_directory(./cson/cjson DIR_SRCS)
+aux_source_directory(./src/helix_mp3_for_windows DIR_SRCS)
+aux_source_directory(./src/helix_mp3_for_windows/real DIR_SRCS)
+aux_source_directory(./src/helix_mp3_for_windows/pub DIR_SRCS)
 
 # 添加子工程
 add_subdirectory(3rd)
@@ -53,4 +59,4 @@ add_subdirectory(3rd)
 add_executable(${TRAGET_NAME} ${DIR_SRCS})
 
 # 链接子工程
-target_link_libraries(${TRAGET_NAME} PRIVATE -lm log.c easylogger)
+target_link_libraries(${TRAGET_NAME} PRIVATE -lm log.c easylogger Winmm)
