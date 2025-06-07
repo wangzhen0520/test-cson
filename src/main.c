@@ -437,6 +437,8 @@ extern void test4();
 extern void test5();
 extern void test8();
 extern int test9();
+extern int test10();
+extern int test11();
 int main(int argc, char *argv[])
 {
     log_info("=========================================");
@@ -474,7 +476,11 @@ int main(int argc, char *argv[])
 
         // test8();
 
-        test9();
+        // test9();
+
+        // test10();
+
+        test11();
 
         usleep(100 * 1000);
     }

@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#include <stdlib.h>
 
 #define _OUTPUT_TO_FILE_ 1
 #define _DEBUG_ 1
@@ -13,12 +14,12 @@ typedef struct{
 	int nChans;
 }MP3_TYPE;
 
-#define READBUF_SIZE 3000
+#define READBUF_SIZE (1024)
 #define MP3BUFFER_SIZE 2304                        //数据帧一帧解码完最大2304*2字节
 char readBuf[READBUF_SIZE];
 short output[MP3BUFFER_SIZE];
-char* mp3Path = "D:\\CloudMusic\\test.mp3";      //系统盘(C:)下无法打开，所以放在D盘
-char* pcmPath = "D:\\CloudMusic\\test.pcm";
+char* mp3Path = "D:\\368833D2E654077381EC261BAAEBCA43.mp3";      //系统盘(C:)下无法打开，所以放在D盘
+char* pcmPath = "D:\\368833D2E654077381EC261BAAEBCA43.pcm";
 
 // int main(int argc, const char *argv[])
 int test9()
@@ -179,7 +180,7 @@ int test9()
 					// Set_WIN_Params(NULL, mp3player.samprate, mp3player.bitsPerSample, mp3player.nChans);
 				}
 				
-				WIN_Play_Samples(output, sizeof(short)*outputSamps);
+				// WIN_Play_Samples(output, sizeof(short)*outputSamps);
 #if _OUTPUT_TO_FILE_
 				fwrite((char*)output, sizeof(short), outputSamps, pcmFile);
 #endif

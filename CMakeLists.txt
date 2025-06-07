@@ -40,6 +40,7 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/src/helix_mp3_for_windows/  
   ${CMAKE_CURRENT_SOURCE_DIR}/src/helix_mp3_for_windows/real
   ${CMAKE_CURRENT_SOURCE_DIR}/src/helix_mp3_for_windows/pub  
+  ${CMAKE_CURRENT_SOURCE_DIR}/minimp3 
 )
 
 # 添加源代码文件夹, 自动扫描所有文件
