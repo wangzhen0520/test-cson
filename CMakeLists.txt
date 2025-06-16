@@ -23,6 +23,7 @@ get_filename_component(CURDIR ${CMAKE_CURRENT_SOURCE_DIR} NAME ABSOLUTE)
 set(TRAGET_NAME ${CURDIR})
 
 # add_definitions(-DDEBUG) # 相当于代码中 #define DEBUG
+add_definitions(-DMINIMP3_IMPLEMENTATION)
 
 # 设置目录
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR})
@@ -40,7 +41,7 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/src/helix_mp3_for_windows/  
   ${CMAKE_CURRENT_SOURCE_DIR}/src/helix_mp3_for_windows/real
   ${CMAKE_CURRENT_SOURCE_DIR}/src/helix_mp3_for_windows/pub  
-  ${CMAKE_CURRENT_SOURCE_DIR}/minimp3 
+  ${CMAKE_CURRENT_SOURCE_DIR}/3rd/minimp3 
 )
 
 # 添加源代码文件夹, 自动扫描所有文件
