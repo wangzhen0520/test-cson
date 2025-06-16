@@ -464,7 +464,7 @@ int main(int argc, char *argv[])
 
         // test3();
 
-        // test4();
+        test4();
         
         // test5();
 
@@ -480,7 +480,7 @@ int main(int argc, char *argv[])
 
         // test10();
 
-        test11();
+        // test11();
 
         usleep(100 * 1000);
     }

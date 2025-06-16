@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "cson.h"
+#include "cJSON.h"
 #if 0
 typedef struct
 {
@@ -89,4 +90,52 @@ void test4()
     printf("~~~~~~~~~\n");
     parse_time_heat_cycle_date_info(msg);
 }
+#endif
+
+#if 0
+void replace_msg_key(cJSON *obj, const char *old_key, const char *new_key)
+{
+    if (!obj || !old_key || !new_key)
+        return;
+
+    // 1. 获取旧key对应的值
+    cJSON *old_item = cJSON_DetachItemFromObject(obj, old_key);
+    if (!old_item) {
+        printf("Key '%s' not found!\n", old_key);
+        return;
+    }
+
+    // 2. 将值挂载到新key下（自动删除旧key）
+    cJSON_AddItemToObject(obj, new_key, old_item);
+}
+
+void test4()
+{
+    // 示例JSON: {"name":"Alice","age":25}
+    const char *json_str =
+        "{\"TimeHeatOn\": 1792, \"TimeHeatOff\": 5888, \"CycleList\": [{\"Year\": 2023, \"StartWeek\": 30, "
+        "\"WeekList\": [60, 62, 62, 62, 62, 62, 62, 62, 62, 30, 192, 62, 62, 62, 62, 62, 62, 62, 62, 62, 62, "
+        "62, 62]}]}";
+
+    // 解析JSON
+    cJSON *root = cJSON_Parse(json_str);
+    if (!root) {
+        fprintf(stderr, "Parse error!\n");
+        return;
+    }
+
+    // 替换 key: "name" -> "username"
+    replace_msg_key(root, "TimeHeatOn", "SetPowerOnTime");
+    replace_msg_key(root, "TimeHeatOff", "SetPowerOffTime");
+
+    // 打印结果
+    char *new_json = cJSON_PrintUnformatted(root);
+    printf("Modified JSON:\n%s\n", new_json);
+
+    // 清理内存
+    free(new_json);
+    cJSON_Delete(root);
+    return;
+}
+
 #endif
