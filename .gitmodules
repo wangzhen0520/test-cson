@@ -1,3 +1,7 @@
 [submodule "3rd/log/log.c"]
 	path = 3rd/log/log.c
-	url = https://github.com/rxi/log.c
+	url = https://gitcode.com/gh_mirrors/lo/log.c.git
+
+[submodule "3rd/minimp3"]
+	path = 3rd/minimp3
+	url = https://gitcode.com/gh_mirrors/mi/minimp3.git
