@@ -161,13 +161,13 @@ size_t skip_id3_tags(FILE *file) {
 
 int main_entry(int argc, char *argv[]) {
     // 参数解析
-    if (argc < 4) {
-        printf("Usage: %s [-mono] [-resample TARGET_RATE] <input.mp3> <output.pcm>\n", argv[0]);
-        printf("Options:\n");
-        printf("  -mono          Convert stereo to mono\n");
-        printf("  -resample RATE Resample to target rate (e.g., 16000)\n");
-        return 1;
-    }
+    // if (argc < 4) {
+    //     printf("Usage: %s [-mono] [-resample TARGET_RATE] <input.mp3> <output.pcm>\n", argv[0]);
+    //     printf("Options:\n");
+    //     printf("  -mono          Convert stereo to mono\n");
+    //     printf("  -resample RATE Resample to target rate (e.g., 16000)\n");
+    //     return 1;
+    // }
 
     int convert_to_mono = 0;
     int resample_rate = 0;
@@ -420,7 +420,8 @@ int main_entry(int argc, char *argv[]) {
 }
 
 int test11() {
-    char *argv[] = {"", "-mono", "-resample", "16000", "D:\\wKgBeVGQ9FqAUoWcAK2pOWIssuA553.mp3", "D:\\wKgBeVGQ9FqAUoWcAK2pOWIssuA553.pcm"};
+    // char *argv[] = {"", "-mono", "-resample", "16000", "D:\\wKgBeVGQ9FqAUoWcAK2pOWIssuA553.mp3", "D:\\wKgBeVGQ9FqAUoWcAK2pOWIssuA553.pcm"};
+    char *argv[] = {"", "D:\\wKgBeVGQ9FqAUoWcAK2pOWIssuA553.mp3", "D:\\wKgBeVGQ9FqAUoWcAK2pOWIssuA553.pcm"};
     int argc = sizeof(argv) / sizeof(argv[0]);
 
     main_entry(argc, argv);
